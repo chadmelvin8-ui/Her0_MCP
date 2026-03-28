@@ -1,0 +1,101 @@
+{
+  "theme": "dark",
+  "archetype": "Archetype 4 (Swiss & High-Contrast) + Retro-Futurism (Terminal)",
+  "colors": {
+    "background": "#09090b",
+    "surface": "#18181b",
+    "border": "#27272a",
+    "primary": "#10b981",
+    "primary_foreground": "#052e16",
+    "secondary": "#27272a",
+    "secondary_foreground": "#fafafa",
+    "accent": "#f59e0b",
+    "destructive": "#ef4444",
+    "destructive_foreground": "#ffffff",
+    "muted": "#27272a",
+    "muted_foreground": "#a1a1aa",
+    "text": {
+      "default": "#f4f4f5",
+      "muted": "#a1a1aa"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "heading": "JetBrains Mono",
+      "body": "IBM Plex Sans",
+      "mono": "JetBrains Mono"
+    },
+    "scales": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter font-bold",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight font-semibold",
+      "h3": "text-xl sm:text-2xl tracking-tight font-medium",
+      "body": "text-base leading-relaxed",
+      "small": "text-sm text-zinc-400 uppercase tracking-[0.2em]"
+    }
+  },
+  "spacing": {
+    "general_padding": "p-6 sm:p-8 md:p-12",
+    "card_padding": "p-6",
+    "gap": "gap-4 md:gap-6",
+    "grid": {
+      "dashboard": "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4",
+      "bento": "grid grid-cols-1 md:grid-cols-8 lg:grid-cols-12 gap-8"
+    }
+  },
+  "surfaces": {
+    "default": "bg-zinc-950 border border-zinc-800 rounded-none shadow-none",
+    "header": "bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800 sticky top-0 z-50",
+    "terminal": "bg-[#050505] border border-emerald-500/30 rounded-none font-mono text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.05)] relative overflow-hidden"
+  },
+  "components": {
+    "button": "rounded-none transition-all font-mono uppercase tracking-wider text-sm",
+    "primary_button": "bg-emerald-500 text-zinc-950 border border-emerald-400 hover:bg-emerald-400 hover:border-emerald-300",
+    "outline_button": "bg-transparent border border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white",
+    "card": "bg-zinc-900 border border-zinc-800 rounded-none",
+    "input": "bg-zinc-900 border border-zinc-800 rounded-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 text-zinc-100 placeholder:text-zinc-600 font-mono text-sm",
+    "badge_critical": "bg-red-500/10 text-red-500 border border-red-500/30 rounded-none uppercase text-xs tracking-wider font-mono",
+    "badge_high": "bg-orange-500/10 text-orange-500 border border-orange-500/30 rounded-none uppercase text-xs tracking-wider font-mono",
+    "badge_medium": "bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 rounded-none uppercase text-xs tracking-wider font-mono",
+    "badge_low": "bg-blue-500/10 text-blue-500 border border-blue-500/30 rounded-none uppercase text-xs tracking-wider font-mono",
+    "badge_info": "bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 rounded-none uppercase text-xs tracking-wider font-mono"
+  },
+  "media": {
+    "images": [
+      {
+        "category": "hero_background",
+        "url": "https://static.prod-images.emergentagent.com/jobs/e73eabdd-1480-45ee-b07d-659457e50b97/images/f553384be855c2c26a775b206a1f52ab97c1592338cd4a95be3143c38ef3a7b4.png",
+        "description": "Abstract dark terminal hacker background, subtle glowing green data nodes, deep obsidian black background",
+        "usage": "Use in the login/setup wizard hero section behind a glass or solid container."
+      },
+      {
+        "category": "logo",
+        "url": "https://static.prod-images.emergentagent.com/jobs/e73eabdd-1480-45ee-b07d-659457e50b97/images/9a94d6a6e7b9b67e34f2e24129fa5b52841599ca4c1b21995b1b56065f44faf2.png",
+        "description": "Minimalist geometric logo for a cybersecurity AI named MCP'Arsonist",
+        "usage": "Use in the header/navigation and setup wizard splash screen."
+      }
+    ]
+  },
+  "motion": {
+    "hover": "transition-all duration-200 ease-in-out",
+    "scanlines": "bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%] pointer-events-none absolute inset-0 z-10 opacity-20"
+  },
+  "icons": {
+    "library": "lucide-react",
+    "installation": "npm i lucide-react",
+    "style": "Technical, angular, and sparse."
+  },
+  "instructions_to_main_agent": [
+    "Strictly adhere to the dark theme and Terminal/Swiss Brutalist archetype. No rounded corners (use `rounded-none`).",
+    "Use JetBrains Mono for all headings, labels, metrics, button text, and terminal outputs.",
+    "Use IBM Plex Sans for body paragraphs and long-form descriptions.",
+    "Grid Layout: The Dashboard must use the 'Control Room' grid with dense spacing (`gap-4`). Span main charts across multiple columns, keep summary metrics 1-col wide.",
+    "Terminal Component: Must implement a custom UI that resembles a retro terminal. Deep black bg (`#050505`), neon green/amber accents, monospace font. Add subtle CSS scanlines over the terminal using the motion.scanlines class.",
+    "Use Shadcn UI extensively, but heavily override the default radii and soft shadows. Use `rounded-none`, 1px solid borders, and intense hover states.",
+    "Never use pure black or pure white except for specific high-contrast text. Base background is `#09090b` (zinc-950).",
+    "All vulnerabilities must be color-coded (Red/Orange/Yellow/Blue/Green) and displayed with high-contrast mono badges.",
+    "Every key interactive element must include a `data-testid` attribute (e.g., `data-testid=\"start-scan-btn\"`).",
+    "Do NOT use native HTML inputs for complex interactions. Use Shadcn Dropdowns, Dialogs, Selects, etc., but customize them to the brutalist theme.",
+    "The header must be sticky, backdrop-blur-xl `bg-zinc-950/80` with a sharp bottom border.",
+    "All cards must have a 1px solid border (`border-zinc-800`), no dropshadows, and straight edges."
+  ]
+}
