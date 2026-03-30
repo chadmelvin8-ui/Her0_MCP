@@ -11,7 +11,8 @@ import {
   Menu,
   X,
   Folder,
-  ChevronRight
+  ChevronRight,
+  Radio
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -20,6 +21,7 @@ const navItems = [
   { path: "/", icon: LayoutDashboard, label: "Dashboard" },
   { path: "/sessions", icon: Folder, label: "Sessions" },
   { path: "/chat", icon: MessageSquare, label: "AI Chat" },
+  { path: "/interceptor", icon: Radio, label: "Interceptor" },
   { path: "/findings", icon: Shield, label: "Findings" },
   { path: "/proxy-history", icon: History, label: "Proxy History" },
   { path: "/reports", icon: FileText, label: "Reports" },

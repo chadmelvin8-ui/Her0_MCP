@@ -12,7 +12,9 @@ import {
   FileText,
   Target,
   Clock,
-  Shield
+  Shield,
+  Upload,
+  Zap
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,9 +53,12 @@ export default function Sessions() {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [showImport, setShowImport] = useState(null); // session ID for import
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [newSession, setNewSession] = useState({ name: "", target_url: "" });
   const [creating, setCreating] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [showHuntAuth, setShowHuntAuth] = useState(null); // session for hunt authorization
 
   useEffect(() => {
     fetchSessions();
@@ -101,14 +106,23 @@ export default function Sessions() {
     setDeleteTarget(null);
   };
 
-  const startHunt = async (sessionId) => {
+  const startHunt = async (sessionId, strategy = "passive", authorized = false) => {
     try {
-      await axios.post(`${API}/hunt/start/${sessionId}`);
-      toast.success("Autonomous hunting started");
+      await axios.post(`${API}/hunt/start/${sessionId}`, {
+        strategy,
+        authorized,
+        target_scope: []
+      });
+      toast.success(`Autonomous hunting started (${strategy} mode)`);
       fetchSessions();
     } catch (error) {
-      toast.error("Failed to start hunting");
+      if (error.response?.status === 403) {
+        toast.error("Active hunting requires authorization");
+      } else {
+        toast.error("Failed to start hunting");
+      }
     }
+    setShowHuntAuth(null);
   };
 
   const stopHunt = async (sessionId) => {
@@ -118,6 +132,28 @@ export default function Sessions() {
       fetchSessions();
     } catch (error) {
       toast.error("Failed to stop hunting");
+    }
+  };
+
+  const importBurpFile = async (sessionId, file) => {
+    setImporting(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await axios.post(
+        `${API}/import/burp-file?session_id=${sessionId}`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+      
+      toast.success(`Imported ${response.data.imported} requests`);
+      fetchSessions();
+    } catch (error) {
+      toast.error("Failed to import file. Ensure it's a valid Burp export (.xml or .json)");
+    } finally {
+      setImporting(false);
+      setShowImport(null);
     }
   };
 
@@ -214,10 +250,10 @@ export default function Sessions() {
                     <Button 
                       size="sm" 
                       className="btn-primary flex-1"
-                      onClick={() => startHunt(session.id)}
+                      onClick={() => setShowHuntAuth(session)}
                       data-testid={`start-hunt-${session.id}`}
                     >
-                      <Play className="w-3 h-3 mr-1" />
+                      <Zap className="w-3 h-3 mr-1" />
                       Hunt
                     </Button>
                   )}
@@ -252,16 +288,28 @@ export default function Sessions() {
 
                 {/* Additional Actions */}
                 <div className="flex items-center justify-between pt-2 border-t border-zinc-800">
-                  <Button 
-                    size="sm" 
-                    variant="ghost"
-                    className="text-xs text-zinc-500 hover:text-zinc-300 px-2"
-                    onClick={() => generateMockData(session.id)}
-                    data-testid={`mock-data-${session.id}`}
-                  >
-                    <Target className="w-3 h-3 mr-1" />
-                    Add Mock Data
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button 
+                      size="sm" 
+                      variant="ghost"
+                      className="text-xs text-zinc-500 hover:text-zinc-300 px-2"
+                      onClick={() => setShowImport(session.id)}
+                      data-testid={`import-${session.id}`}
+                    >
+                      <Upload className="w-3 h-3 mr-1" />
+                      Import
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="ghost"
+                      className="text-xs text-zinc-500 hover:text-zinc-300 px-2"
+                      onClick={() => generateMockData(session.id)}
+                      data-testid={`mock-data-${session.id}`}
+                    >
+                      <Target className="w-3 h-3 mr-1" />
+                      Mock
+                    </Button>
+                  </div>
                   <Button 
                     size="sm" 
                     variant="ghost"
@@ -382,6 +430,127 @@ export default function Sessions() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Import Burp File Dialog */}
+      <Dialog open={!!showImport} onOpenChange={() => setShowImport(null)}>
+        <DialogContent className="bg-zinc-900 border-zinc-800">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-lg text-zinc-100">
+              Import Burp Suite Export
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="font-mono text-sm text-zinc-400">
+              Upload a Burp Suite export file (.xml or .json) to import proxy history for analysis.
+            </p>
+            <div className="border-2 border-dashed border-zinc-700 p-6 text-center">
+              <Upload className="w-8 h-8 text-zinc-500 mx-auto mb-2" />
+              <input
+                type="file"
+                accept=".xml,.json"
+                onChange={(e) => {
+                  if (e.target.files[0]) {
+                    importBurpFile(showImport, e.target.files[0]);
+                  }
+                }}
+                className="hidden"
+                id="burp-file-input"
+              />
+              <label 
+                htmlFor="burp-file-input"
+                className="font-mono text-sm text-emerald-500 cursor-pointer hover:underline"
+              >
+                {importing ? "Importing..." : "Click to select file"}
+              </label>
+              <p className="font-mono text-xs text-zinc-600 mt-2">
+                Supports Burp XML and JSON exports
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              className="btn-outline"
+              onClick={() => setShowImport(null)}
+              disabled={importing}
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Hunt Authorization Dialog */}
+      <Dialog open={!!showHuntAuth} onOpenChange={() => setShowHuntAuth(null)}>
+        <DialogContent className="bg-zinc-900 border-zinc-800">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-lg text-zinc-100">
+              Start Vulnerability Hunt
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="font-mono text-sm text-zinc-400">
+              Choose hunting strategy for "{showHuntAuth?.name}":
+            </p>
+            
+            <div className="space-y-3">
+              <div 
+                className="p-3 border border-zinc-700 hover:border-emerald-500/50 cursor-pointer transition-colors"
+                onClick={() => startHunt(showHuntAuth?.id, "passive", false)}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 bg-emerald-500" />
+                  <span className="font-mono text-sm text-zinc-200">Passive Analysis</span>
+                </div>
+                <p className="font-mono text-xs text-zinc-500 ml-4">
+                  Analyze existing traffic without sending requests. Safe for any target.
+                </p>
+              </div>
+              
+              <div 
+                className="p-3 border border-zinc-700 hover:border-amber-500/50 cursor-pointer transition-colors"
+                onClick={() => startHunt(showHuntAuth?.id, "active_safe", true)}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 bg-amber-500" />
+                  <span className="font-mono text-sm text-zinc-200">Active (Safe)</span>
+                </div>
+                <p className="font-mono text-xs text-zinc-500 ml-4">
+                  Send non-destructive test requests. Requires authorization.
+                </p>
+              </div>
+              
+              <div 
+                className="p-3 border border-zinc-700 hover:border-red-500/50 cursor-pointer transition-colors"
+                onClick={() => startHunt(showHuntAuth?.id, "active_full", true)}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 bg-red-500" />
+                  <span className="font-mono text-sm text-zinc-200">Active (Full)</span>
+                </div>
+                <p className="font-mono text-xs text-zinc-500 ml-4">
+                  Full autonomous testing with payloads. Only for authorized targets!
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-amber-500/10 border border-amber-500/30 p-3 mt-4">
+              <p className="font-mono text-xs text-amber-500">
+                ⚠️ Active modes send real requests. Only use on targets you own or have explicit permission to test.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              className="btn-outline"
+              onClick={() => setShowHuntAuth(null)}
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

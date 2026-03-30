@@ -7,6 +7,7 @@ import Sessions from "@/pages/Sessions";
 import Chat from "@/pages/Chat";
 import Findings from "@/pages/Findings";
 import ProxyHistory from "@/pages/ProxyHistory";
+import Interceptor from "@/pages/Interceptor";
 import Settings from "@/pages/Settings";
 import Reports from "@/pages/Reports";
 import Layout from "@/components/Layout";
@@ -21,6 +22,7 @@ function App() {
             <Route path="sessions" element={<Sessions />} />
             <Route path="chat/:sessionId?" element={<Chat />} />
             <Route path="findings" element={<Findings />} />
+            <Route path="interceptor" element={<Interceptor />} />
             <Route path="proxy-history/:sessionId?" element={<ProxyHistory />} />
             <Route path="reports/:sessionId?" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
