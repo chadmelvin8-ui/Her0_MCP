@@ -1,68 +1,107 @@
 # MCP'Arsonist AI - Product Requirements Document
 
 ## Original Problem Statement
-Build a complete AI-powered penetration testing terminal-based application called "MCP'Arsonist AI" with a companion web dashboard. The app integrates with Burp Suite via MCP (Model Context Protocol) and supports multiple AI backends (Ollama, OpenAI, Anthropic, Gemini).
+Build a complete, REAL working AI-powered penetration testing application called "MCP'Arsonist AI" with:
+- Real Burp Suite MCP integration (not simulation)
+- Proxy interceptor for capturing/modifying requests
+- Import functionality for Burp exports (.xml, .json)
+- Autonomous hunting with active testing capabilities
+- Multi-AI provider support (OpenAI, Anthropic, Gemini, Ollama)
+- Full authorization flow for active testing modes
 
 ## User Personas
-1. **Security Researcher** - Needs automated vulnerability hunting with AI assistance
-2. **Penetration Tester** - Requires session management and professional reporting
-3. **Bug Bounty Hunter** - Wants quick vulnerability identification and evidence collection
+1. **Security Researcher** - Uses passive analysis for safe vulnerability discovery
+2. **Penetration Tester** - Requires active testing with full tool integration
+3. **Bug Bounty Hunter** - Needs efficient autonomous hunting with evidence collection
 
 ## Core Requirements (Static)
-- Multi-AI provider support (OpenAI, Anthropic, Gemini, Ollama)
-- Session-based vulnerability hunting
-- Interactive AI chat interface
-- Proxy history analysis
-- Vulnerability findings management
+- Real MCP protocol connection to Burp Suite
+- Proxy interception with Forward/Drop/Modify capabilities
+- Multiple hunting strategies (passive, active_safe, active_full)
+- Import Burp exports for offline analysis
+- AI-powered vulnerability analysis
 - Professional security reports
-- Terminal-style dark theme UI
 
-## What's Been Implemented (2026-03-28)
+## What's Been Implemented (2026-03-30)
+
 ### Backend (FastAPI + MongoDB)
-- [x] Session CRUD operations
-- [x] Findings CRUD with severity filtering
-- [x] AI chat integration (OpenAI, Anthropic, Gemini via Emergent LLM Key)
-- [x] Ollama local model support
-- [x] Proxy history management
-- [x] Dashboard statistics API
-- [x] Autonomous hunting mode (start/stop)
-- [x] Report generation with JSON export
-- [x] Configuration management
-- [x] Mock data generation for testing
+- [x] Real BurpMCPClient with full MCP protocol support
+- [x] All MCP tools: proxy_history, send_request, repeater, intruder, scope, site_map
+- [x] ProxyInterceptor class with request capture/modification
+- [x] Match & Replace rules engine
+- [x] Request/Response modifiers (add/remove headers, change method, inject scripts)
+- [x] AutonomousHunter with pattern-based detection
+- [x] Hunting strategies: PASSIVE, ACTIVE_SAFE, ACTIVE_FULL
+- [x] BurpExportParser for XML and JSON imports
+- [x] WebSocket support for real-time updates
+- [x] AI integration via Emergent LLM Key
+- [x] File upload for Burp exports
 
 ### Frontend (React + Shadcn UI)
-- [x] Dashboard with real-time stats
-- [x] Sessions management with Hunt/Stop controls
-- [x] AI Chat with quick commands
-- [x] Findings viewer with filtering
-- [x] Proxy History viewer with request/response details
-- [x] Settings page for AI provider configuration
-- [x] Reports page with export functionality
-- [x] Terminal-style dark theme (JetBrains Mono font, green accents)
+- [x] Dashboard with Burp connection status
+- [x] Sessions with Import/Hunt dialogs
+- [x] Hunt authorization flow (3 modes)
+- [x] Interceptor page with request editor
+- [x] Forward/Drop/Forward Modified actions
+- [x] Send to Repeater/Intruder buttons
+- [x] AI Chat with auto-context fetching
+- [x] Findings management with severity filtering
+- [x] Proxy History viewer
+- [x] Settings for AI provider configuration
+- [x] Professional report generation
+
+## Architecture
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│   Web Browser   │────▶│  React Frontend  │────▶│  FastAPI Backend│
+│    (User)       │     │  (Dashboard UI)  │     │   (Port 8001)   │
+└─────────────────┘     └──────────────────┘     └────────┬────────┘
+                                                          │
+                                                          │ MCP Protocol
+                                                          │ (HTTP/SSE)
+                                                          ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    Burp Suite (User's Machine)                       │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐      │
+│  │  Proxy (8080)   │  │    Repeater     │  │    Intruder     │      │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘      │
+│                          MCP Server Extension (Port 9876)            │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
 ## Prioritized Backlog
 
-### P0 (MVP Complete)
-- [x] Core session management
-- [x] AI chat functionality
-- [x] Basic vulnerability tracking
+### P0 (MVP Complete) ✅
+- [x] Real MCP client implementation
+- [x] Interceptor with Forward/Drop
+- [x] Autonomous hunting (passive + active)
+- [x] File import for Burp exports
+- [x] AI analysis integration
 
-### P1 (Future)
-- [ ] Real Burp Suite MCP integration
+### P1 (Next Phase)
 - [ ] CLI installer script (`pip install mcparsonist`)
-- [ ] Curl-based installer (`curl | bash`)
-- [ ] WebSocket real-time updates
-- [ ] PDF report generation
+- [ ] Real-time SSE streaming from Burp
+- [ ] PDF report export
+- [ ] Custom vulnerability signatures
 
-### P2 (Nice to Have)
-- [ ] Training mode for Burp Suite mastery
-- [ ] Multi-step autonomous agent workflows
-- [ ] Screenshot capture for findings
+### P2 (Future)
 - [ ] Docker deployment option
+- [ ] Training mode for Burp Suite mastery
 - [ ] Team collaboration features
+- [ ] Vulnerability database integration
+
+## Setup Instructions for Users
+
+1. Install Burp Suite Community/Pro Edition
+2. Clone and build MCP Server: https://github.com/PortSwigger/mcp-server
+3. Load MCP Server JAR as Burp extension
+4. MCP Server runs on 127.0.0.1:9876
+5. Access MCP'Arsonist AI web dashboard
+6. Create session and start hunting!
 
 ## Next Tasks
-1. Implement real Burp Suite MCP server connection
-2. Add CLI package distribution
-3. Create installation scripts for cross-platform support
-4. Add PDF export for reports
+1. Create pip-installable CLI package
+2. Add PDF export for reports
+3. Implement custom signature editor
+4. Add rate limiting for active tests
